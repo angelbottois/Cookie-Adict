@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ciq1l2c4y81gf"
-path="res://.godot/imported/Captura de pantalla 2026-01-22 203619.png-9df3a561e3ebdabf1f2b056e7b44f4fd.ctex"
+uid="uid://wfcrxkua7ebd"
+path="res://.godot/imported/La_Galleta.png-305f7d0c2dac1d98b6b80d45b56aac15.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Captura de pantalla 2026-01-22 203619.png"
-dest_files=["res://.godot/imported/Captura de pantalla 2026-01-22 203619.png-9df3a561e3ebdabf1f2b056e7b44f4fd.ctex"]
+source_file="res://Assets/Imagenes/La_Galleta.png"
+dest_files=["res://.godot/imported/La_Galleta.png-305f7d0c2dac1d98b6b80d45b56aac15.ctex"]
 
 [params]
 
