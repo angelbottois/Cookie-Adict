@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://b4fbav6hmlul8"]
+
+[ext_resource type="Texture2D" uid="uid://ciq1l2c4y81gf" path="res://Captura de pantalla 2026-01-22 203619.png" id="1_se5mi"]
+
+[node name="Node2D" type="Node2D" unique_id=1703088446]
+
+[node name="RigidBody2D" type="RigidBody2D" parent="." unique_id=1845120997]
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D" unique_id=2095895051]
+
+[node name="CapturaDePantalla20260122203619" type="Sprite2D" parent="." unique_id=2081899440]
+position = Vector2(484, 284)
+texture = ExtResource("1_se5mi")
