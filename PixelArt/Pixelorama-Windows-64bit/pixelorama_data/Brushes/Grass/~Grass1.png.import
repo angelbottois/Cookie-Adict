@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wfcrxkua7ebd"
-path="res://.godot/imported/La_Galleta.png-305f7d0c2dac1d98b6b80d45b56aac15.ctex"
+uid="uid://ix36ygwsh2dd"
+path="res://.godot/imported/~Grass1.png-295c1af004f838f03aad17c835debae4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Imagenes/La_Galleta.png"
-dest_files=["res://.godot/imported/La_Galleta.png-305f7d0c2dac1d98b6b80d45b56aac15.ctex"]
+source_file="res://PixelArt/Pixelorama-Windows-64bit/pixelorama_data/Brushes/Grass/~Grass1.png"
+dest_files=["res://.godot/imported/~Grass1.png-295c1af004f838f03aad17c835debae4.ctex"]
 
 [params]
 
