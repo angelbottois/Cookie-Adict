@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wfcrxkua7ebd"
-path="res://.godot/imported/La_Galleta.png-bdb658a73feff80437ca4497e9868b7b.ctex"
+uid="uid://gtlmw0ryteyp"
+path="res://.godot/imported/Ejemplo Barra.png-a12004faf930531a6306b8af6c978b39.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Sprites/Objetos/La_Galleta.png"
-dest_files=["res://.godot/imported/La_Galleta.png-bdb658a73feff80437ca4497e9868b7b.ctex"]
+source_file="res://Assets/Sprites/Ejemplo Barra.png"
+dest_files=["res://.godot/imported/Ejemplo Barra.png-a12004faf930531a6306b8af6c978b39.ctex"]
 
 [params]
 

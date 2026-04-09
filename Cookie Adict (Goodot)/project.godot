@@ -14,6 +14,14 @@ config/name="Cookie Adict"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="uid://wfcrxkua7ebd"
 
+[autoload]
+
+GameManager="*uid://5ihxbvem3qvg"
+ShopManager="*uid://bby5jyxbtk3el"
+PrestigeManager="*uid://c1b4w7swhbniu"
+LocalizationManager="*uid://5wxsvkrxht2k"
+SaveManager="*uid://ccs6sjpyi0s1y"
+
 [display]
 
 window/size/viewport_width=1270
