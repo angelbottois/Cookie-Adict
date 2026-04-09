@@ -1,7 +1,0 @@
-[gd_scene format=3 uid="uid://c6m120gnr4n67"]
-
-[ext_resource type="Texture2D" uid="uid://qe5o0fk8kv0e" path="res://PixelArt/Prototipo-Escena/Fondo-Capas.png" id="1_f7cmv"]
-
-[node name="Sprite2D" type="Sprite2D" unique_id=49720700]
-texture = ExtResource("1_f7cmv")
-centered = false

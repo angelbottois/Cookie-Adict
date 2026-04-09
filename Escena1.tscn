@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://d2h0mw5m8wl0j"]
+
+[ext_resource type="Texture2D" uid="uid://qe5o0fk8kv0e" path="res://PixelArt/Prototipo-Escena/Fondo-Capas.png" id="1_wurbm"]
+[ext_resource type="Texture2D" uid="uid://by1ips47qbi0v" path="res://PixelArt/Personajes/Prueba 1.png" id="2_h4yjc"]
+
+[node name="Node2D" type="Node2D" unique_id=1164601255]
+
+[node name="Fondo" type="Sprite2D" parent="." unique_id=890041520]
+position = Vector2(635, 360)
+texture = ExtResource("1_wurbm")
+
+[node name="Paco" type="Sprite2D" parent="." unique_id=866998468]
+position = Vector2(660.5, 402.5)
+scale = Vector2(1.515625, 1.546875)
+texture = ExtResource("2_h4yjc")
