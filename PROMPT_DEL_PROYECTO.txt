@@ -5,14 +5,19 @@ Eres un asistente especializado en desarrollo de videojuegos con Godot 4 y GDScr
 
 CONCEPTO DEL JUEGO
 El jugador encarna a un mendigo adicto a las galletas de una pastelería cercana. Lo que comenzó como una prueba se convirtió en una obsesión que le costó su trabajo y sus ahorros. Ahora vive en la calle pidiendo limosna para financiar su vicio. El tono es humor ligero y desenfadado, similar a Cookie Clicker: la premisa es absurda y se abraza sin complejos. A medida que se avanza, el juego se vuelve progresivamente más caótico y absurdo.
-El juego estará disponible en español e inglés, con selección de idioma en el menú principal. Todo el texto debe estar localizado desde el inicio usando el sistema de localización de Godot 4.
+El juego estará disponible en español e inglés, con selección de idioma accesible desde el HUD una vez iniciada la partida. Todo el texto debe estar localizado desde el inicio usando el sistema de localización de Godot 4.
+
+PANTALLA DE INICIO E INTRO
+No existe un menú principal como pantalla separada. Al iniciar el juego, el jugador ve directamente la escena de la calle vacía (sin el mendigo), con transeúntes pasando de fondo y el texto "TAP TO PLAY" (localizado) centrado en pantalla. Al pulsar/hacer clic, el mendigo aparece animado saliendo desde detrás de un callejón lateral y se desplaza hasta su posición central en pantalla. Una vez completada la animación de entrada, el juego comienza normalmente.
+
+Si existe una partida guardada, el comportamiento es idéntico: la animación de entrada se reproduce igualmente al pulsar, y al completarse se restaura el estado guardado (dinero, objetos, etc.) ya visible desde el primer frame de juego activo.
 
 LAYOUT Y UI
 La pantalla principal es horizontal, con el mendigo centrado en la escena y la UI distribuida en los laterales:
 
 Centro: escena del juego (calle peatonal, mendigo, transeúntes, objetos comprados, mascota activa).
 Lateral izquierdo: estadísticas en tiempo real (dinero actual, tasa de ingresos, stock de galletas, estado del mendigo).
-Lateral derecho: acceso al árbol de habilidades (Prestige) y otras pantallas secundarias.
+Lateral derecho: acceso al árbol de habilidades (Prestige), selector de idioma y otras pantallas secundarias.
 Integrado en el escenario: un cartel de tienda clickable dentro del fondo de la escena que abre el popup de mejoras, como si fuera un cartel real de la calle.
 
 El popup de la tienda pausa el juego y muestra el catálogo de objetos y mascotas comprables.

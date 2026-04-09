@@ -1,6 +1,6 @@
 # 🍪 Cookie Addict — Arquitectura de Escenas (Godot 4)
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Motor:** Godot 4 — GDScript  
 **Última revisión:** 2026-04
 
@@ -35,7 +35,6 @@ res://
 ├── scenes/
 │   ├── main/
 │   │   ├── Main.tscn               # Escena raíz del juego
-│   │   ├── MainMenu.tscn           # Menú principal (idioma, nueva partida, continuar)
 │   │   └── GameScreen.tscn         # Pantalla de juego principal (layout completo)
 │   │
 │   ├── game/
@@ -111,6 +110,7 @@ Variables principales:
 - `is_penalized: bool` — penalización activa por falta de galletas
 - `game_day: int` — día actual de juego (afecta al consumo)
 - `bills_unlocked: bool` — billetes desbloqueados vía Prestige
+- `game_started: bool` — false hasta que el jugador pulsa y la animación de entrada termina
 
 Señales:
 - `money_changed(new_value: float)`
@@ -118,6 +118,7 @@ Señales:
 - `penalty_started()`
 - `penalty_ended()`
 - `stats_recalculated()`
+- `game_started()` — emitida al completarse la animación de entrada del mendigo
 
 ### ShopManager.gd
 **Responsabilidad:** Catálogo de objetos, estado de compras y efectos sobre GameManager.
@@ -179,41 +180,40 @@ Main (Node)
 └── CurrentScene (Node)                  # Escena activa (intercambiable)
 ```
 
-**Lógica:** Main.gd gestiona el cambio de escena activa (MainMenu → GameScreen). No contiene lógica de juego; solo navegación y transición visual.
-
-Al arrancar: comprueba SaveManager.has_save(). Si hay partida, ofrece continuar. Si no, carga MainMenu directamente.
+**Lógica:** Main.gd carga directamente GameScreen al arrancar. No existe MainMenu como escena separada. El estado de "menú" es gestionado internamente por GameScreen mediante su fase de intro (ver sección 4).
 
 ---
 
 ## 4. Escenas principales
 
-### MainMenu.tscn
-```
-MainMenu (Control)
-├── Background (TextureRect)
-├── Logo (TextureRect)
-├── VBoxContainer
-│   ├── BtnNewGame (Button)
-│   ├── BtnContinue (Button)             # Solo visible si hay guardado
-│   └── BtnLanguage (Button)             # Alterna ES / EN
-└── VersionLabel (Label)
-```
-
 ### GameScreen.tscn
-**Esta es la pantalla principal de juego.** Contiene el layout completo en horizontal.
+**Única pantalla del juego.** Gestiona tanto la fase de intro como el juego activo.
 
 ```
 GameScreen (Control)
-├── HUDLeft (HUDLeft.tscn instanciada)   # Panel izquierdo — estadísticas
-├── GameWorld (GameWorld.tscn instanciada) # Centro — escena del juego
-├── HUDRight (HUDRight.tscn instanciada) # Panel derecho — acceso Prestige
-└── PopupLayer (CanvasLayer)             # Capa de popups (z_index alto)
-    ├── ShopPopup (ShopPopup.tscn)       # Popup tienda (oculto por defecto)
-    ├── PrecisionMinigame (PrecisionMinigame.tscn) # Minijuego (oculto)
-    └── ConfirmDialog (ConfirmDialog.tscn) # Confirmación Prestige (oculto)
+├── HUDLeft (HUDLeft.tscn instanciada)       # Panel izquierdo — estadísticas
+│   └── [oculto durante la intro]
+├── GameWorld (GameWorld.tscn instanciada)   # Centro — escena del juego
+├── HUDRight (HUDRight.tscn instanciada)     # Panel derecho — acceso Prestige
+│   └── [oculto durante la intro]
+├── IntroOverlay (CanvasLayer)               # Capa de intro (z_index alto, process_mode = ALWAYS)
+│   └── TapToPlayLabel (Label)               # Texto "TAP TO PLAY" centrado, animación pulse
+└── PopupLayer (CanvasLayer)                 # Capa de popups (z_index más alto aún)
+    ├── ShopPopup (ShopPopup.tscn)
+    ├── PrecisionMinigame (PrecisionMinigame.tscn)
+    └── ConfirmDialog (ConfirmDialog.tscn)
 ```
 
-**Importante:** Los popups viven en un CanvasLayer separado para garantizar que siempre se renderizan encima del juego y que la pausa (get_tree().paused = true) no los afecta (su process_mode = ALWAYS).
+**Flujo de la intro:**
+
+1. Al cargar GameScreen, `get_tree().paused = true`. GameWorld se muestra (calle con transeúntes de fondo corriendo en modo ALWAYS), pero el mendigo está oculto y los HUDs están ocultos.
+2. IntroOverlay muestra el texto "TAP TO PLAY" con animación de pulso (Tween en loop).
+3. Al recibir cualquier input (clic / tap), IntroOverlay se oculta con fade out.
+4. Se llama a `Beggar.play_intro_animation()`: el mendigo aparece desde detrás del callejón lateral (fuera de pantalla) y camina hasta su posición central mediante Tween/AnimationPlayer.
+5. Al completarse la animación, `get_tree().paused = false`, los HUDs hacen fade in y `GameManager.game_started` pasa a `true`.
+6. Si `SaveManager.has_save()`, el estado guardado se aplica sobre GameManager/ShopManager antes del paso 5, de forma que el juego arranca con los datos restaurados en el mismo instante en que el mendigo llega a su posición.
+
+**Selección de idioma:** No ocurre en la intro. El jugador puede cambiar el idioma en cualquier momento desde un botón en HUDRight.
 
 ---
 
@@ -237,6 +237,7 @@ Se actualiza conectando señales de GameManager (money_changed, cookies_changed,
 HUDRight (PanelContainer)
 └── VBoxContainer
     ├── BtnPrestige (Button)             # Abre PrestigeScreen (solo visible si umbral alcanzado)
+    ├── BtnLanguage (Button)             # Alterna ES / EN en cualquier momento
     └── BtnSave (Button)                 # Guardado manual
 ```
 
@@ -295,14 +296,16 @@ GameWorld (Node2D)
 │   ├── BackgroundLayer (ParallaxLayer) # Edificios del fondo
 │   └── StreetLayer (ParallaxLayer)     # Acera / suelo
 │
+├── AlleyEntrance (Marker2D)            # Punto de spawn del mendigo en la intro (fuera de pantalla, lateral)
+│
 ├── DayNightOverlay (ColorRect)         # Overlay de ciclo día/noche (alpha variable)
 │
 ├── ObjectsLayer (Node2D)               # Objetos comprados (aparecen al comprar)
 │   ├── DonationContainerSlot (Marker2D) # Posición fija del recipiente activo
 │   ├── SignBoardSlot (Marker2D)         # Posición fija del cartel activo
-│   └── RestZoneSlot (Marker2D)         # Posición fija de la zona de descanso activa
+│   └── RestZoneSlot (Marker2D)          # Posición fija de la zona de descanso activa
 │
-├── BeggarNode (Beggar.tscn)            # El mendigo, centrado en pantalla
+├── BeggarNode (Beggar.tscn)            # El mendigo; oculto al inicio, visible tras intro
 │
 ├── PetSlot (Marker2D)                  # Posición de la mascota junto al mendigo
 │   └── [Pet.tscn instanciada dinámicamente]
@@ -315,23 +318,28 @@ GameWorld (Node2D)
     └── ShopSignSprite (Sprite2D)
 ```
 
-**ShopSign** es el punto de entrada a la tienda. Al hacer clic sobre él, emite señal que GameScreen captura para abrir ShopPopup.
+**AlleyEntrance:** Marker2D situado fuera del borde lateral de la pantalla, junto a la boca de un callejón pintado en el fondo. Es el punto de partida de la animación de entrada del mendigo.
 
-**PasserbyPool:** se gestiona con object pooling. El número de instancias activas simultáneas es limitado (máximo ~30). Cuando un transeúnte sale de pantalla, se recicla en lugar de eliminarse.
+**PasserbyPool:** se gestiona con object pooling. El número de instancias activas simultáneas es limitado (máximo ~30). Cuando un transeúnte sale de pantalla, se recicla en lugar de eliminarse. Los transeúntes corren durante la intro (process_mode = ALWAYS en el pool) para dar vida a la calle mientras se muestra "TAP TO PLAY".
+
+**ShopSign** es el punto de entrada a la tienda. Al hacer clic sobre él, emite señal que GameScreen captura para abrir ShopPopup. Permanece inactivo (input_pickable = false) durante la fase de intro.
 
 ### Beggar.tscn
 ```
 Beggar (CharacterBody2D)
-├── AnimatedSprite2D                    # Estados: idle, happy, sad (penalizado), eating
+├── AnimatedSprite2D                    # Estados: intro_walk, idle, happy, sad, eating
 ├── CollisionShape2D
 └── StatusIcon (Sprite2D)               # Icono de estado (opcional: zzz, !, etc.)
 ```
 
-Estados del mendigo (controlados por GameManager):
-- `idle` — estado normal
+Estados del mendigo:
+- `intro_walk` — animación de caminar usada durante la entrada desde el callejón
+- `idle` — estado normal de juego
 - `happy` — tras recibir donación grande
 - `sad` — penalización por falta de galletas
 - `eating` — animación de consumo de galleta
+
+Función pública: `play_intro_animation()` — mueve el nodo desde AlleyEntrance hasta su posición central mediante Tween, reproduciendo `intro_walk`. Al finalizar, emite la señal `intro_finished`.
 
 ### Passerby.tscn
 ```
@@ -343,7 +351,7 @@ Passerby (CharacterBody2D)
 
 Lógica (Passerby.gd):
 - Se mueve horizontalmente a velocidad variable (de izquierda a derecha o viceversa).
-- Al spawn, se decide si donará (según donation_chance de GameManager).
+- Al spawn, se decide si donará (según donation_chance de GameManager). Durante la intro, nunca donan (game_started = false).
 - Si dona, al pasar junto al mendigo emite señal `donated(amount)` y activa la partícula.
 - Al salir de pantalla, emite señal `exited` para que el pool lo recicle.
 
@@ -357,7 +365,7 @@ SpecialPasserby (CharacterBody2D)
 └── CollisionShape2D (del ClickArea)
 ```
 
-Lógica: si el jugador hace clic sobre el ClickArea mientras el transeúnte está en pantalla, se pausa el juego y se abre PrecisionMinigame.
+Lógica: si el jugador hace clic sobre el ClickArea mientras el transeúnte está en pantalla, se pausa el juego y se abre PrecisionMinigame. No puede aparecer durante la intro.
 
 ### Pet.tscn
 ```
@@ -431,11 +439,11 @@ Se usa el sistema nativo de Godot 4 (TranslationServer + archivos .po/.translati
 
 **Estructura de claves:**
 ```
-ui.menu.new_game          → "Nueva partida" / "New Game"
-ui.menu.continue          → "Continuar" / "Continue"
+ui.intro.tap_to_play      → "TAP TO PLAY" / "TAP TO PLAY"
 ui.hud.money              → "Dinero:" / "Money:"
 ui.hud.cookies            → "Galletas:" / "Cookies:"
 ui.hud.income_rate        → "Ingresos/s:" / "Income/s:"
+ui.hud.language           → "ES / EN" / "ES / EN"
 ui.shop.title             → "Tienda" / "Shop"
 ui.shop.buy               → "Comprar" / "Buy"
 items.container.1.name    → "Vaso de cartón" / "Cardboard Cup"
@@ -447,7 +455,7 @@ prestige.title            → "Árbol de Habilidades" / "Skill Tree"
 
 **Regla:** Ningún texto visible al jugador se escribe directamente en el código o en escenas. Siempre se usa `tr("clave")` o `LocalizationManager.tr_key("clave")`.
 
-El idioma seleccionado en MainMenu se guarda en SaveManager y se restaura al iniciar.
+El idioma puede cambiarse en cualquier momento desde el botón en HUDRight. El idioma activo se guarda en SaveManager y se restaura al iniciar.
 
 ---
 
@@ -471,25 +479,26 @@ El idioma seleccionado en MainMenu se guarda en SaveManager y se restaura al ini
 
 ```
 Main.tscn
-└── MainMenu.tscn ──────────────────────────────────────────────────────────┐
-                                                                             │
-└── GameScreen.tscn                                                          │
-    ├── HUDLeft.tscn          ←── GameManager (señales)                      │
-    ├── HUDRight.tscn         ←── PrestigeManager (señales)                  │
-    ├── GameWorld.tscn                                                        │
-    │   ├── Beggar.tscn       ←── GameManager (estado del mendigo)           │
-    │   ├── PasserbyPool      ←── GameManager (spawn rate, donation_chance)  │
-    │   ├── Pet.tscn          ←── ShopManager (mascota activa)               │
-    │   ├── ObjectsLayer      ←── ShopManager (objetos comprados)            │
-    │   └── ShopSign          ──→ ShopPopup (señal on_click)                 │
+└── GameScreen.tscn
+    ├── IntroOverlay (CanvasLayer)       # Activo solo durante la intro
+    │   └── TapToPlayLabel              # Input → dispara intro del mendigo
+    ├── HUDLeft.tscn          ←── GameManager (señales)         [oculto en intro]
+    ├── HUDRight.tscn         ←── PrestigeManager (señales)     [oculto en intro]
+    ├── GameWorld.tscn
+    │   ├── Beggar.tscn       ←── GameManager (estado)          [oculto en intro hasta animación]
+    │   │   └── intro_finished ──→ GameScreen (inicia juego)
+    │   ├── PasserbyPool      ←── GameManager (spawn rate)       [activo en intro, sin donar]
+    │   ├── Pet.tscn          ←── ShopManager (mascota activa)
+    │   ├── ObjectsLayer      ←── ShopManager (objetos comprados)
+    │   └── ShopSign          ──→ ShopPopup (señal on_click)     [inactivo en intro]
     └── PopupLayer
-        ├── ShopPopup.tscn    ←→ ShopManager (compras, catálogo)             │
-        ├── PrecisionMinigame ←→ GameManager (recompensa, evento)            │
-        ├── PrestigeScreen    ←→ PrestigeManager (árbol, puntos)             │
-        └── ConfirmDialog     ←── PrestigeManager (confirmar Prestige)       │
-                                                                             │
-Autoloads (disponibles globalmente en todas las escenas):                    │
-├── GameManager      ←──────────────────────────────────────────────────────┘
+        ├── ShopPopup.tscn    ←→ ShopManager (compras, catálogo)
+        ├── PrecisionMinigame ←→ GameManager (recompensa, evento)
+        ├── PrestigeScreen    ←→ PrestigeManager (árbol, puntos)
+        └── ConfirmDialog     ←── PrestigeManager (confirmar Prestige)
+
+Autoloads (disponibles globalmente en todas las escenas):
+├── GameManager
 ├── ShopManager
 ├── PrestigeManager
 ├── LocalizationManager
@@ -500,13 +509,14 @@ Autoloads (disponibles globalmente en todas las escenas):                    │
 
 ## Notas de diseño técnico
 
-**Object pooling en transeúntes:** Con 10–20 transeúntes por segundo, crear y destruir nodos continuamente sería costoso. Se mantiene un pool de instancias pre-creadas (máximo 30) que se reutilizan al salir de pantalla.
+**Intro sin MainMenu:** La fase de intro (calle vacía + "TAP TO PLAY") se gestiona enteramente dentro de GameScreen mediante un CanvasLayer (IntroOverlay) y el estado `game_started` de GameManager. No hay cambio de escena; solo aparición/ocultación de nodos y control de pausa.
 
-**Pausa selectiva:** Los popups (ShopPopup, PrecisionMinigame) usan `process_mode = ALWAYS` para responder a input aunque el árbol esté pausado. El GameWorld y los transeúntes tienen `process_mode = PAUSABLE` (default).
+**Object pooling en transeúntes:** Con 10–20 transeúntes por segundo, crear y destruir nodos continuamente sería costoso. Se mantiene un pool de instancias pre-creadas (máximo 30) que se reutilizan al salir de pantalla. El pool corre durante la intro para dar vida a la calle.
+
+**Pausa selectiva:** Los popups (ShopPopup, PrecisionMinigame) y el IntroOverlay usan `process_mode = ALWAYS` para responder a input aunque el árbol esté pausado. El GameWorld y los transeúntes tienen `process_mode = PAUSABLE` (default), excepto el PasserbyPool durante la intro que necesita correr.
 
 **Compatibilidad móvil:** Los botones y áreas clicables se dimensionan con mínimo 44×44 px táctiles desde el inicio. El layout usa anclas relativas (no posiciones fijas) para adaptarse a distintas resoluciones.
 
 **Ciclo día/noche:** DayNightOverlay es un ColorRect que va de alpha 0 (día) a alpha 0.6 color azul oscuro (noche) mediante Tween, sincronizado con game_day en GameManager.
 
 **Señales sobre polling:** Toda la UI se actualiza por señales, nunca con _process(delta). Esto reduce la carga especialmente en la HUD, que de otro modo actualizaría decenas de Labels cada frame.
-```
