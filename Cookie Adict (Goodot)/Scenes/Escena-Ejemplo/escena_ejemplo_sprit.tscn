@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://ldfidt0a7yuf"]
+
+[ext_resource type="Texture2D" uid="uid://crqohcq7pe23k" path="res://Assets/Sprites/Carteles/Cartel-Nivel-1.png" id="1_t1fgj"]
+[ext_resource type="Texture2D" uid="uid://bda6iaunjed5i" path="res://Assets/Sprites/Carteles/Cartel-Nivel-2.png" id="2_u3xbu"]
+[ext_resource type="Texture2D" uid="uid://cgihfe3oxia6v" path="res://Assets/Sprites/Carteles/Cartel-Nivel-3.png" id="3_alwpx"]
+
+[node name="Escena-Ejemplo-Sprit" type="Node2D" unique_id=1866847774]
+
+[node name="Cartel-Nivel1" type="Sprite2D" parent="." unique_id=334938566]
+texture_filter = 1
+position = Vector2(555, 313)
+texture = ExtResource("1_t1fgj")
+
+[node name="Cartel-Nivel2" type="Sprite2D" parent="." unique_id=1097973986]
+texture_filter = 1
+position = Vector2(557, 315)
+texture = ExtResource("2_u3xbu")
+
+[node name="Cartel-Nivel3" type="Sprite2D" parent="." unique_id=1609907363]
+texture_filter = 1
+position = Vector2(559, 317)
+texture = ExtResource("3_alwpx")
