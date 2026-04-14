@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://po3701ieuuc5"]
 
 [ext_resource type="Script" uid="uid://1iipesg6sk3m" path="res://Scenes/Main/hud_left.gd" id="1_0e7bs"]
+[ext_resource type="Script" uid="uid://1y2r5bkgqrru" path="res://Scenes/Main/game_screen.gd" id="1_reg34"]
 [ext_resource type="Script" uid="uid://c47dfweoicp6m" path="res://Scenes/Main/hud_right.gd" id="2_reg34"]
 [ext_resource type="Script" uid="uid://bjtfqubgmql3y" path="res://Scenes/Main/game_world.gd" id="3_vp021"]
 
@@ -11,6 +12,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_reg34")
 
 [node name="HUDLeft" type="PanelContainer" parent="." unique_id=509269265]
 visible = false
@@ -39,3 +41,31 @@ offset_bottom = 23.0
 text = "Tap to Play!"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="PopupLayer" type="CanvasLayer" parent="." unique_id=670727306]
+process_mode = 3
+layer = 10
+
+[node name="ShopPopup" type="Control" parent="PopupLayer" unique_id=480303110]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PrecisionMinigame" type="Control" parent="PopupLayer" unique_id=1648653194]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ConfirmDialog" type="Control" parent="PopupLayer" unique_id=252239896]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
