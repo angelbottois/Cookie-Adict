@@ -1,11 +1,18 @@
 [gd_scene format=3 uid="uid://b2lmxfyc03xjv"]
 
+[ext_resource type="Script" uid="uid://dfeonx68ntaxh" path="res://Scenes/Main/Main.gd" id="1_p8rbg"]
+
 [node name="Main" type="Node2D" unique_id=1375009699]
+script = ExtResource("1_p8rbg")
 
 [node name="SceneTransition" type="CanvasLayer" parent="." unique_id=1754148538]
+layer = 10
 
 [node name="FadeRect" type="ColorRect" parent="SceneTransition" unique_id=283798036]
+modulate = Color(1, 1, 1, 0)
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
 
 [node name="CurrentScene" type="Node" parent="." unique_id=1539270068]

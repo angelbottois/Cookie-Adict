@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://po3701ieuuc5"]
+
+[ext_resource type="Script" uid="uid://1iipesg6sk3m" path="res://Scenes/Main/hud_left.gd" id="1_0e7bs"]
+[ext_resource type="Script" uid="uid://c47dfweoicp6m" path="res://Scenes/Main/hud_right.gd" id="2_reg34"]
+[ext_resource type="Script" uid="uid://bjtfqubgmql3y" path="res://Scenes/Main/game_world.gd" id="3_vp021"]
+
+[node name="GameScreen" type="Control" unique_id=729127273]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HUDLeft" type="PanelContainer" parent="." unique_id=509269265]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_0e7bs")
+
+[node name="HUDRight" type="PanelContainer" parent="." unique_id=839011969]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_reg34")
+
+[node name="GameWorld" type="Node2D" parent="." unique_id=1636403338]
+script = ExtResource("3_vp021")
+
+[node name="IntroOverlay" type="CanvasLayer" parent="." unique_id=624301708]
+process_mode = 3
+layer = 5
+
+[node name="TapToPlayLabel" type="Label" parent="IntroOverlay" unique_id=458276262]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Tap to Play!"
+horizontal_alignment = 1
+vertical_alignment = 1
